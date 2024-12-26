@@ -40,8 +40,10 @@ class PenjadwalanTugas:
     def tampilkan_semua_tugas_rekursif(self, tugas=None, index=0):
         if tugas is None:
             tugas = self.tugas_rekursif
-        if index == len(tugas):
+        if not tugas: 
             return "Tidak ada tugas yang terdaftar."
+        if index == len(tugas):
+            return []
         t = tugas[index]
         tugas_str = f"{t[2]} (Deadline: {t[1].strftime('%Y-%m-%d %H:%M')}, Prioritas: {t[0]})"
         return [tugas_str] + self.tampilkan_semua_tugas_rekursif(tugas, index + 1)
