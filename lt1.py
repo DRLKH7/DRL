@@ -1,12 +1,12 @@
 import heapq
 from datetime import datetime, timedelta
 import timeit
-import matplotlib.pyplot as plt  # Tambahan untuk plot grafik
+import matplotlib.pyplot as plt  
 
 class PenjadwalanTugas:
     def __init__(self):
-        self.tugas_iteratif = []  # Struktur data untuk iteratif
-        self.tugas_rekursif = []  # Struktur data untuk rekursif
+        self.tugas_iteratif = []  
+        self.tugas_rekursif = [] 
 
     def tambah_tugas_iteratif(self, nama, tanggal, waktu, prioritas):
         try:
@@ -41,7 +41,7 @@ class PenjadwalanTugas:
         if tugas is None:
             tugas = self.tugas_rekursif
         if index == len(tugas):
-            return []
+            return "Tidak ada tugas yang terdaftar."
         t = tugas[index]
         tugas_str = f"{t[2]} (Deadline: {t[1].strftime('%Y-%m-%d %H:%M')}, Prioritas: {t[0]})"
         return [tugas_str] + self.tampilkan_semua_tugas_rekursif(tugas, index + 1)
