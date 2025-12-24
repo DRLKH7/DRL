@@ -1,0 +1,31 @@
+{
+  "name": "express-example-paas",
+  "version": "1.0.0",
+  "description": "Simple code for example PaaS cloud computing",
+  "keywords": [
+    "express",
+    "paas",
+    "cloud",
+    "computing"
+  ],
+  "homepage": "https://github.com/Sleepy4k/express-example-paas#readme",
+  "bugs": {
+    "url": "https://github.com/Sleepy4k/express-example-paas/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sleepy4k/express-example-paas.git"
+  },
+  "license": "ISC",
+  "author": "Benjamin4k",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "pug": "^3.0.3"
+  }
+}

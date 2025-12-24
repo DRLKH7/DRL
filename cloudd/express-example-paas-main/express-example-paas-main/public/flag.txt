@@ -1,0 +1,1 @@
+CTF{This_is_simple_web_service}
