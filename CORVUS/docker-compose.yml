@@ -1,0 +1,65 @@
+version: '3.8'
+
+services:
+  db:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: corvus
+      POSTGRES_PASSWORD: corvus
+      POSTGRES_DB: corvus_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+
+  api:
+    build: .
+    command: uvicorn backend.app:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=postgresql://corvus:corvus@db:5432/corvus_db
+      - REDIS_URL=redis://redis:6379/0
+    depends_on:
+      - db
+      - redis
+
+  frontend:
+    build: 
+      context: ./frontend
+    container_name: corvus_frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=https://corvusnoct.my.id/api
+
+  worker:
+    build: .
+    command: celery -A backend.queue.celery_app worker --loglevel=info -Q high_priority
+    volumes:
+      - .:/app
+    environment:
+      - DATABASE_URL=postgresql://corvus:corvus@db:5432/corvus_db
+      - REDIS_URL=redis://redis:6379/0
+  nginx:
+    image: nginx:alpine
+    container_name: corvus_nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/corvus.conf:/etc/nginx/conf.d/default.conf
+      - /etc/letsencrypt:/etc/letsencrypt
+    depends_on:
+      - api
+      - frontend
+
+volumes:
+  postgres_data:
