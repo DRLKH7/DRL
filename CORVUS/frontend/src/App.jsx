@@ -349,6 +349,20 @@ const ReportsPage = () => {
                             </div>
                             <div className="flex gap-4">
                                 <button 
+                                    onClick={async () => {
+                                        if (window.confirm("Are you sure you want to delete this report?")) {
+                                            const res = await fetch(`${API_BASE}/reports/${selectedReport.id}`, { method: "DELETE" });
+                                            if (res.ok) {
+                                                setSelectedReport(null);
+                                                fetch(`${API_BASE}/reports`).then(r => r.json()).then(d => setReports(d));
+                                            }
+                                        }
+                                    }}
+                                    className="bg-slate-900 text-slate-500 p-3 rounded-2xl hover:bg-red-600 hover:text-white transition-all shadow-lg relative z-50 group cursor-pointer"
+                                >
+                                    <X className="w-5 h-5 group-active:scale-90 transition-transform" />
+                                </button>
+                                <button 
                                     onClick={() => {
                                         const reportData = JSON.stringify(selectedReport, null, 4);
                                         const blob = new Blob([reportData], { type: 'application/json' });

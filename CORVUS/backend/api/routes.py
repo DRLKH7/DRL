@@ -61,6 +61,23 @@ def export_json(scan_id: str, db: Session = Depends(database.get_db)):
     scan = db.query(models.Scan).filter(models.Scan.id == scan_id).first()
     return JSONResponse(content={"id": scan.id, "target": scan.target, "findings": scan.findings})
 
+@router.delete("/reports/{scan_id}")
+def delete_report(scan_id: str, db: Session = Depends(database.get_db)):
+    scan = db.query(models.Scan).filter(models.Scan.id == scan_id).first()
+    if not scan: raise HTTPException(status_code=404, detail="Not found")
+    
+    # Delete database record
+    db.delete(scan)
+    db.commit()
+    
+    # Optionally delete files in tools_output
+    import shutil
+    output_dir = os.path.join("tools_output", str(scan_id))
+    if os.path.exists(output_dir):
+        shutil.rmtree(output_dir)
+        
+    return {"status": "deleted"}
+
 @router.get("/reports/{scan_id}/pdf")
 def export_pdf(scan_id: str, db: Session = Depends(database.get_db)):
     # PDF logic implemented here or in external util

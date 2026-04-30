@@ -171,5 +171,5 @@ Thumbs.db
 # Corvus Specific
 /tools_output/
 /backend/logs/
-/backend/db/*.sqlite3
-/backend/db/*.db
+*.db
+*.sqlite3
