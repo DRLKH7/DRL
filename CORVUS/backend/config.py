@@ -42,6 +42,22 @@ class Settings(BaseSettings):
     ENABLE_CUSTOM_VULNS: bool = True
     SAFE_RATE_LIMIT_REQUESTS: int = 5
 
+    # Tool Paths (Assumes binaries in PATH or GOPATH/bin)
+    SUBFINDER_PATH: str = "subfinder"
+    HTTPX_PATH: str = "httpx"
+    NAABU_PATH: str = "naabu"
+    KATANA_PATH: str = "katana"
+    GAU_PATH: str = "gau"
+    FFUF_PATH: str = "ffuf"
+    NUCLEI_PATH: str = "nuclei"
+    DALFOX_PATH: str = "dalfox"
+    SQLMAP_PATH: str = "sqlmap"
+    GF_PATH: str = "gf"
+    LOXS_PATH: str = "python3 ~/loxs/loxs.py" # Example path
+    
+    # Wordlists
+    FFUF_WORDLIST: str = "/usr/share/wordlists/dirb/common.txt" # Default fallback
+
     class Config:
         env_file = ".env"
 
