@@ -5,7 +5,7 @@ from typing import List
 class Settings(BaseSettings):
     APP_NAME: str = "Corvus"
     APP_ENV: str = "development"
-    DATABASE_URL: str = "postgresql://corvus:corvus@localhost:5432/corvus_db"
+    DATABASE_URL: str = "sqlite:///./corvus_v3.db"
     REDIS_URL: str = "redis://localhost:6379/0"
     
     # Scan Limits
@@ -29,11 +29,18 @@ class Settings(BaseSettings):
     
     # CORS
     CORS_ORIGINS: List[str] = [
-        "http://localhost:3000", 
+        "http://localhost",
+        "http://localhost:3000",
         "http://localhost:5173",
+        "http://127.0.0.1",
         "https://corvusnoct.my.id",
         "http://corvusnoct.my.id"
     ]
+
+    # New Enhancement Settings
+    SCAN_CACHE_TTL: int = 3600
+    ENABLE_CUSTOM_VULNS: bool = True
+    SAFE_RATE_LIMIT_REQUESTS: int = 5
 
     class Config:
         env_file = ".env"

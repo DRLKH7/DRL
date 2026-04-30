@@ -42,5 +42,20 @@ If you want to run components individually:
 ## Ethical Use
 Corvus is intended for authorized security testing only. Scanning targets without explicit permission is illegal and unethical.
 
+## 📚 Documentation
+Corvus Red Edition uses MkDocs Material for professional documentation.
+
+### Build Documentation
+```bash
+pip install mkdocs-material
+mkdocs build
+```
+
+### Serve Locally
+```bash
+mkdocs serve
+```
+The documentation will be available at `http://127.0.0.1:8000`.
+
 ## License
 MIT License

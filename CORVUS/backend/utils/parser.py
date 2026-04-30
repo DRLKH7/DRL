@@ -14,11 +14,13 @@ class Parser:
             if not line: continue
             try:
                 data = json.loads(line)
+                # Ensure endpoint is extracted from matched-at or template-id
+                endpoint = data.get("matched-at") or data.get("url", "/")
                 results.append({
                     "type": data.get("template-id"),
-                    "severity": data.get("info", {}).get("severity", "info").upper(),
+                    "severity": data.get("info", {}).get("severity", "info").lower(),
                     "source": "nuclei",
-                    "endpoint": data.get("matched-at"),
+                    "endpoint": endpoint,
                     "raw": data,
                     "confidence": 1.0
                 })
@@ -51,8 +53,32 @@ class Parser:
     
     @staticmethod
     def parse_dalfox(output: str) -> List[Dict[str, Any]]:
-        """Parses dalfox findings."""
-        # Dalfox output parsing logic
+        """Parses Dalfox output (expecting JSON per line or simple text)."""
         results = []
-        # Implementation depends on dalfox output format (JSON/Text)
+        for line in output.strip().split('\n'):
+            if not line: continue
+            if '"type":"vulnerability"' in line: # Dalfox JSON format
+                try:
+                    data = json.loads(line)
+                    results.append({
+                        "type": "xss",
+                        "severity": "HIGH",
+                        "source": "dalfox",
+                        "endpoint": data.get("url"),
+                        "raw": data,
+                        "confidence": 1.0
+                    })
+                except: continue
+            elif "[POC]" in line: # Dalfox text format
+                # Example: [POC][G][V] http://target.com/page?q=...
+                parts = line.split(" ")
+                url = parts[-1] if parts else "unknown"
+                results.append({
+                    "type": "xss",
+                    "severity": "HIGH",
+                    "source": "dalfox",
+                    "endpoint": url,
+                    "raw": line,
+                    "confidence": 0.9
+                })
         return results
