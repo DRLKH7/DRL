@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Payment Notification System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-slate-50 p-8">
+    <div class="max-w-4xl mx-auto">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h1 class="text-2xl font-bold text-slate-800 mb-4">
+                🧪 Payment Notification System - Test Panel
+            </h1>
+            
+            <div class="space-y-4">
+                <!-- Test 1: Check API Endpoint -->
+                <div class="border border-slate-200 rounded-lg p-4">
+                    <h2 class="font-semibold text-lg mb-2">1. Test API Endpoint</h2>
+                    <button onclick="testGetPaymentEvents()" 
+                            class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded">
+                        Test GET /api/midtrans/payment-events
+                    </button>
+                    <pre id="result1" class="mt-2 bg-slate-100 p-3 rounded text-xs overflow-auto max-h-40"></pre>
+                </div>
+
+                <!-- Test 2: Simulate Midtrans Callback -->
+                <div class="border border-slate-200 rounded-lg p-4">
+                    <h2 class="font-semibold text-lg mb-2">2. Simulate Midtrans Callback</h2>
+                    <div class="space-y-2">
+                        <input type="text" id="testOrderId" placeholder="Order ID (e.g., TEST-001)" 
+                               class="border border-slate-300 rounded px-3 py-2 w-full">
+                        <button onclick="simulateCallback()" 
+                                class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded">
+                            Send Test Callback
+                        </button>
+                    </div>
+                    <pre id="result2" class="mt-2 bg-slate-100 p-3 rounded text-xs overflow-auto max-h-40"></pre>
+                </div>
+
+                <!-- Test 3: Start Polling -->
+                <div class="border border-slate-200 rounded-lg p-4">
+                    <h2 class="font-semibold text-lg mb-2">3. Start Polling (Like Frontend)</h2>
+                    <button onclick="startPolling()" 
+                            class="bg-purple-500 hover:bg-purple-600 text-white px-4 py-2 rounded mr-2">
+                        Start Polling (3s interval)
+                    </button>
+                    <button onclick="stopPolling()" 
+                            class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
+                        Stop Polling
+                    </button>
+                    <div id="pollingStatus" class="mt-2 text-sm text-slate-600"></div>
+                    <pre id="result3" class="mt-2 bg-slate-100 p-3 rounded text-xs overflow-auto max-h-60"></pre>
+                </div>
+
+                <!-- Event Log -->
+                <div class="border border-slate-200 rounded-lg p-4">
+                    <h2 class="font-semibold text-lg mb-2">📋 Event Log</h2>
+                    <button onclick="clearLog()" 
+                            class="bg-slate-500 hover:bg-slate-600 text-white px-3 py-1 rounded text-sm mb-2">
+                        Clear Log
+                    </button>
+                    <div id="eventLog" class="space-y-1 max-h-80 overflow-auto"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let pollingInterval = null;
+        let lastEventTime = null;
+        let processedEventIds = new Set();
+
+        function log(message, type = 'info') {
+            const logDiv = document.getElementById('eventLog');
+            const colors = {
+                info: 'bg-blue-50 text-blue-700 border-blue-200',
+                success: 'bg-green-50 text-green-700 border-green-200',
+                error: 'bg-red-50 text-red-700 border-red-200',
+                warning: 'bg-yellow-50 text-yellow-700 border-yellow-200'
+            };
+            
+            const entry = document.createElement('div');
+            entry.className = `text-xs p-2 rounded border ${colors[type]}`;
+            entry.innerHTML = `<span class="font-mono">${new Date().toLocaleTimeString()}</span> - ${message}`;
+            logDiv.insertBefore(entry, logDiv.firstChild);
+        }
+
+        function clearLog() {
+            document.getElementById('eventLog').innerHTML = '';
+        }
+
+        async function testGetPaymentEvents() {
+            try {
+                log('Testing GET /api/midtrans/payment-events...', 'info');
+                const response = await fetch('/api/midtrans/payment-events');
+                const data = await response.json();
+                
+                document.getElementById('result1').textContent = JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    log(`✅ API works! Found ${data.events?.length || 0} events`, 'success');
+                } else {
+                    log('❌ API returned error', 'error');
+                }
+            } catch (error) {
+                document.getElementById('result1').textContent = error.message;
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function simulateCallback() {
+            const orderId = document.getElementById('testOrderId').value || 'TEST-' + Date.now();
+            
+            try {
+                log(`Simulating Midtrans callback for order: ${orderId}...`, 'info');
+                
+                const response = await fetch('/api/midtrans/test', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        order_id: orderId,
+                        status: 'settlement'
+                    })
+                });
+                
+                const data = await response.json();
+                document.getElementById('result2').textContent = JSON.stringify(data, null, 2);
+                
+                if (response.ok) {
+                    log(`✅ Callback processed! Order ${orderId} marked as paid`, 'success');
+                    log('💡 Now check polling to see if event is captured', 'warning');
+                } else {
+                    log(`❌ Callback failed: ${data.message || 'Unknown error'}`, 'error');
+                }
+            } catch (error) {
+                document.getElementById('result2').textContent = error.message;
+                log(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+
+        async function pollPaymentEvents() {
+            try {
+                const url = lastEventTime 
+                    ? `/api/midtrans/payment-events?since=${encodeURIComponent(lastEventTime)}`
+                    : '/api/midtrans/payment-events';
+                
+                const response = await fetch(url);
+                const data = await response.json();
+                
+                document.getElementById('result3').textContent = JSON.stringify(data, null, 2);
+                
+                if (data.status === 'success' && data.events && data.events.length > 0) {
+                    log(`📥 Received ${data.events.length} new event(s)!`, 'success');
+                    
+                    for (const event of data.events) {
+                        const eventId = `${event.payment_reference}-${event.timestamp}`;
+                        
+                        if (!processedEventIds.has(eventId)) {
+                            processedEventIds.add(eventId);
+                            lastEventTime = event.timestamp;
+                            
+                            log(`🎉 New Payment: Rp ${event.total} via ${event.payment_method} | Customer: ${event.customer || 'N/A'}`, 'success');
+                            log(`   Reference: ${event.payment_reference}`, 'info');
+                            
+                            // Simulate TTS
+                            log(`🔊 [SIMULATED] Playing TTS: "Pembayaran sebesar Rp ${event.total} via ${event.payment_method} Dari ${event.customer || 'Customer'} Diterima"`, 'warning');
+                        }
+                    }
+                } else {
+                    log('✓ Polling... No new events', 'info');
+                }
+            } catch (error) {
+                log(`❌ Polling error: ${error.message}`, 'error');
+            }
+        }
+
+        function startPolling() {
+            if (pollingInterval) {
+                log('⚠️ Polling already running', 'warning');
+                return;
+            }
+            
+            log('▶️ Starting polling (every 3 seconds)...', 'success');
+            document.getElementById('pollingStatus').innerHTML = '🟢 <strong>Polling Active</strong>';
+            
+            // Initial poll
+            pollPaymentEvents();
+            
+            // Start interval
+            pollingInterval = setInterval(pollPaymentEvents, 3000);
+        }
+
+        function stopPolling() {
+            if (pollingInterval) {
+                clearInterval(pollingInterval);
+                pollingInterval = null;
+                log('⏹️ Polling stopped', 'error');
+                document.getElementById('pollingStatus').innerHTML = '🔴 <strong>Polling Stopped</strong>';
+            }
+        }
+
+        // Initial log
+        log('🚀 Test panel loaded. Ready to test!', 'success');
+    </script>
+</body>
+</html>

@@ -1,0 +1,145 @@
+@import 'tailwindcss';
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
+        'Segoe UI Symbol', 'Noto Color Emoji';
+
+    /* Brand palette: Primary gold (#f0b100 at 500) */
+    --color-primary-50:  #fff8e1; /* very light */
+    --color-primary-100: #ffefb3;
+    --color-primary-200: #ffe580;
+    --color-primary-300: #ffd54d;
+    --color-primary-400: #ffc61a;
+    --color-primary-500: #f0b100; /* brand */
+    --color-primary-600: #d99f00;
+    --color-primary-700: #b38100;
+    --color-primary-800: #8c6500;
+    --color-primary-900: #6b4e00;
+    --color-primary-950: #3d2c00;
+
+    /* Optional secondary accent (teal) for success/links when needed */
+    --color-secondary-50:  #edfdfa;
+    --color-secondary-100: #d1faee;
+    --color-secondary-200: #a7f3da;
+    --color-secondary-300: #6ee7bf;
+    --color-secondary-400: #34d3a6;
+    --color-secondary-500: #14b8a6;
+    --color-secondary-600: #0d9488;
+    --color-secondary-700: #0f766e;
+    --color-secondary-800: #115e59;
+    --color-secondary-900: #134e4a;
+    --color-secondary-950: #062c2a;
+}
+
+/* Base color-scheme so native widgets adapt */
+/* Light is default; when .dark is on <html>, prefer dark */
+html { color-scheme: light dark; }
+html.dark { color-scheme: dark; }
+
+/* Global accent for form controls and text selection */
+:root { accent-color: var(--color-primary-600); }
+::selection { background: var(--color-primary-300); color: #0b0b0b; }
+html.dark ::selection { background: var(--color-primary-500); color: #0b0b0b; }
+
+/* Base page surfaces */
+body { background-color: rgb(248 250 252); color: rgb(15 23 42); }
+html.dark body { background-color: rgb(2 6 23); color: rgb(241 245 249); }
+
+/* Minimal dark-mode overrides to make existing light classes look good in dark */
+/* Keep this small and focused; prefer using Tailwind "dark:" utilities for new UI. */
+
+/* Backgrounds */
+html.dark .bg-white { background-color: rgb(30 41 59) !important; }         /* slate-800 */
+html.dark .bg-slate-50 { background-color: rgb(2 6 23) !important; }        /* slate-950 */
+html.dark .bg-slate-100 { background-color: rgb(15 23 42) !important; }     /* slate-900 */
+html.dark .bg-white\/80 { background-color: rgba(30,41,59,0.8) !important; }
+html.dark .bg-white\/60 { background-color: rgba(30,41,59,0.6) !important; }
+html.dark .bg-slate-50\/80 { background-color: rgba(2,6,23,0.8) !important; }
+html.dark .bg-slate-50\/60 { background-color: rgba(2,6,23,0.6) !important; }
+html.dark .bg-slate-100\/80 { background-color: rgba(15,23,42,0.8) !important; }
+html.dark .bg-slate-100\/60 { background-color: rgba(15,23,42,0.6) !important; }
+
+/* Text colors */
+html.dark .text-slate-900 { color: rgb(241 245 249) !important; }           /* slate-100 */
+html.dark .text-slate-700 { color: rgb(203 213 225) !important; }           /* slate-300 */
+html.dark .text-slate-600 { color: rgb(203 213 225) !important; }           /* slate-300 */
+html.dark .text-slate-500 { color: rgb(148 163 184) !important; }           /* slate-400 */
+html.dark .text-slate-400 { color: rgb(148 163 184) !important; }           /* slate-400 */
+
+/* Borders */
+html.dark .border-slate-200 { border-color: rgb(51 65 85) !important; }     /* slate-700 */
+html.dark .border-slate-100 { border-color: rgb(51 65 85) !important; }     /* slate-700 */
+html.dark .border-slate-300 { border-color: rgb(71 85 105) !important; }    /* slate-600 */
+html.dark .ring-slate-200 { --tw-ring-color: rgb(51 65 85) !important; }
+html.dark .divide-slate-200 > :not([hidden]) ~ :not([hidden]) { --tw-divide-opacity: 1; border-color: rgb(51 65 85) !important; }
+html.dark .divide-slate-300 > :not([hidden]) ~ :not([hidden]) { --tw-divide-opacity: 1; border-color: rgb(71 85 105) !important; }
+
+/* Hovers */
+html.dark .hover\:bg-slate-50:hover { background-color: rgb(15 23 42) !important; } /* slate-900 */
+html.dark .hover\:bg-slate-100:hover { background-color: rgb(30 41 59) !important; } /* slate-800 */
+
+/* Subtle badges (keep accent colors as-is) */
+html.dark .bg-emerald-50 { background-color: rgba(16,185,129,0.12) !important; }
+html.dark .bg-amber-50 { background-color: rgba(245,158,11,0.12) !important; }
+html.dark .bg-indigo-50 { background-color: rgba(99,102,241,0.12) !important; }
+html.dark .bg-primary-50 { background-color: rgba(240,177,0,0.12) !important; }
+
+/* Tables & chips */
+html.dark thead.bg-slate-50 { background-color: rgb(15 23 42) !important; }
+html.dark .chip.active { background-color: rgba(240,177,0,0.15) !important; color: rgb(254 249 195) !important; }
+
+/* Sidebar collapse/expand (desktop) */
+/* Smooth transition for content that uses pl-72/ml-72 to reserve sidebar space */
+.md\:pl-72, .lg\:pl-72, .md\:ml-72, .lg\:ml-72 { transition: padding-left .3s ease, margin-left .3s ease; }
+
+/* When collapsed, hide the sidebar and remove reserved space */
+html.sidebar-collapsed #sidebar { transform: translateX(-100%) !important; }
+html.sidebar-collapsed .md\:pl-72 { padding-left: 0 !important; }
+html.sidebar-collapsed .lg\:pl-72 { padding-left: 0 !important; }
+html.sidebar-collapsed .md\:ml-72 { margin-left: 0 !important; }
+html.sidebar-collapsed .lg\:ml-72 { margin-left: 0 !important; }
+
+/* Optional: indicator rotation for toggle icon */
+[data-sidebar-toggle] [data-icon="collapse"] { display: inline; }
+html.sidebar-collapsed [data-sidebar-toggle] [data-icon="collapse"] { display: none; }
+html.sidebar-collapsed [data-sidebar-toggle] [data-icon="expand"] { display: inline; }
+
+
+
+/* === App-level Theme Variables & Utilities (Cleaner Dark/Light) === */
+/* We use CSS variables so components can rely on semantic colors without repeating dark: classes. */
+:root, html[data-theme="light"] {
+    --app-bg-surface: rgb(248 250 252); /* slate-50 */
+    --app-bg-card: #ffffff;
+    --app-bg-muted: rgb(241 245 249); /* slate-100 */
+    /* --app-text-primary: rgb(71 85 105); slate-900 */
+    /* --app-text-secondary: rgb(71 85 105); slate-600 */
+    --app-border: rgb(226 232 240); /* slate-200 */
+}
+html.dark, html[data-theme="dark"] {
+    --app-bg-surface: rgb(2 6 23);      /* slate-950 */
+    --app-bg-card: rgb(15 23 42);       /* slate-900 */
+    --app-bg-muted: rgb(30 41 59);      /* slate-800 */
+    --app-text-primary: rgb(241 245 249); /* slate-100 */
+    --app-text-secondary: rgb(148 163 184); /* slate-400 */
+    --app-border: rgb(51 65 85);        /* slate-700 */
+}
+
+.app-bg-surface { background-color: var(--app-bg-surface); }
+.app-bg-card { background-color: var(--app-bg-card); }
+.app-bg-muted { background-color: var(--app-bg-muted); }
+.app-text-primary { color: var(--app-text-primary); }
+/* .app-text-secondary { color: var(--app-text-secondary); } */
+.app-border { border-color: var(--app-border); }
+
+/* Smooth theme transition (added briefly when toggling) */
+html.theme-transition, html.theme-transition * {
+    transition: background-color .35s ease, color .35s ease, border-color .35s ease;
+}
+
+
